@@ -42,6 +42,9 @@ def draw_neural_net(
     n_layers = len(layer_sizes)
     v_spacing = (top - bottom) / float(max(layer_sizes))
     h_spacing = (right - left) / float(len(layer_sizes) - 1)
+    uni_char = '\u2113'
+    mpl.rcParams["text.usetex"] = False
+
     # Nodes
     for n, layer_size in enumerate(layer_sizes):
         layer_top = v_spacing * (layer_size - 1) / 2.0 + (top + bottom) / 2.0
@@ -55,7 +58,7 @@ def draw_neural_net(
             ax.add_artist(circle)
             if n == 0:  # input layer
                 ax.annotate(
-                    f"${input_prefix}^{m}$",
+                    f"${input_prefix}_{{{m+1}}}^{{({{{uni_char}}})}}$",
                     xy=(n * h_spacing + left, layer_top - m * v_spacing),
                     ha="center",
                     va="center",
@@ -64,7 +67,7 @@ def draw_neural_net(
                 )
             if (n >= 1) & (n < n_layers - 1):  # hidden layers
                 ax.annotate(
-                    f"${hidden_prefix}_{m+1}^{n}$",
+                    f"${hidden_prefix}_{{{m+1}}}^{{{[n]}}}$",
                     xy=(n * h_spacing + left, layer_top - m * v_spacing),
                     ha="center",
                     va="center",
@@ -73,7 +76,7 @@ def draw_neural_net(
                 )
             if n == n_layers - 1:  # output layer
                 ax.annotate(
-                    f"${output_prefix}_{m+1}$",
+                    f"${output_prefix}_{{{m+1}}}$",
                     xy=(n * h_spacing + left, layer_top - m * v_spacing),
                     ha="center",
                     va="center",
@@ -136,6 +139,7 @@ def draw_weighted_neural_net(
     n_layers = len(layer_sizes)
     v_spacing = (top - bottom) / float(max(layer_sizes))
     h_spacing = (right - left) / float(len(layer_sizes) - 1)
+    uni_char = '\u2113'
 
     # ensure weights are correct dimensions
     use_node_wts = False
@@ -170,7 +174,7 @@ def draw_weighted_neural_net(
             ax.add_artist(circle)
             if n == 0:  # input layer
                 ax.annotate(
-                    f"${input_prefix}^{m}$",
+                    f"${input_prefix}_{{{m+1}}}^{{({{{uni_char}}})}}$",
                     xy=(n * h_spacing + left, layer_top - m * v_spacing),
                     ha="center",
                     va="center",
@@ -179,7 +183,7 @@ def draw_weighted_neural_net(
                 )
             if (n >= 1) & (n < n_layers - 1):  # hidden layers
                 ax.annotate(
-                    f"${hidden_prefix}_{m+1}^{n}$",
+                    f"${hidden_prefix}_{{{m+1}}}^{{{[n]}}}$",
                     xy=(n * h_spacing + left, layer_top - m * v_spacing),
                     ha="center",
                     va="center",
@@ -188,7 +192,7 @@ def draw_weighted_neural_net(
                 )
             if n == n_layers - 1:  # output layer
                 ax.annotate(
-                    f"${output_prefix}_{m+1}$",
+                    f"${output_prefix}_{{{m+1}}}$",
                     xy=(n * h_spacing + left, layer_top - m * v_spacing),
                     ha="center",
                     va="center",
