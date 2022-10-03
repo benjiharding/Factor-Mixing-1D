@@ -39,10 +39,9 @@ def binary_runs(x, runs_above):
 def _check_runs_above(first_run, runs, runs_above=True):
     if runs_above:
         if first_run:
-            runs = runs[1::2]
+            return runs[1::2]
         else:
-            runs = runs[0::2]
-        return runs
+            return runs[0::2]
     else:
         return runs
 
@@ -74,9 +73,9 @@ def _check_runs_above(first_run, runs, runs_above=True):
 @njit
 def n_pt_conn(X, nstep):
     """Global n-point connectivity fucntion of binary matrix X
-    X.shape = (len(dh), ndh)
+    X.shape = (max(len(dh)), ndh)
     """
-    X = np.asarray(X)
+    X = 1 - np.asarray(X)  # continuity of highs
     xmax = X.shape[0]
     ndh = X.shape[1]
     phi_n = np.zeros(nstep, dtype=np.float64)
