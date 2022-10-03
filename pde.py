@@ -98,3 +98,39 @@ def pde(
     pool.join()
 
     return best, fitness[best_idx], objv
+
+
+def de(fobj, args, bounds, mut=(0.5, 1), crossp=0.7, popsize=15, its=1000, seed=515151):
+    """differential evolotuion of objective function `fobj`"""
+
+    rng = np.random.default_rng(seed)
+    dimensions = len(bounds)
+    pop = rng.uniform(size=(popsize, dimensions))
+    min_b, max_b = np.asarray(bounds).T
+    diff = np.fabs(min_b - max_b)
+    pop_denorm = denormalize(min_b, diff, pop)
+    fitness = np.asarray([fobj(ind, args) for ind in pop_denorm])
+    best_idx = np.argmin(fitness)
+    best = pop_denorm[best_idx]
+
+    # main loop over iteations
+    for i in range(its):
+
+        # loop over population
+        for j in range(popsize):
+
+            d = rng.uniform(low=mut[0], high=mut[1])
+            mutant = bound_repair(rand1(j, pop, d, rng))
+            trial = binomial_crossover(pop[j], mutant, crossp, rng)
+            trial_denorm = denormalize(min_b, diff, trial)
+            f = fobj(trial_denorm, args)
+
+            if f < fitness[j]:
+                fitness[j] = f
+                pop[j] = trial
+
+                if f < fitness[best_idx]:
+                    best_idx = j
+                    best = trial_denorm
+
+        yield best, fitness[best_idx]
