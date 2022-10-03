@@ -31,17 +31,18 @@ def update_variogram(values, lag_dict):
     """
     if not lag_dict:
         return
-    nlags = len(lag_dict)
+    nlags = len(lag_dict.keys())
     expvario = np.full(nlags, np.nan)
-    for n in range(nlags):
+    # for n in range(nlags):
+    for n, ilag in zip(lag_dict.keys(), range(nlags)):
         tail = values[lag_dict[n][:, 0]]
         head = values[lag_dict[n][:, 1]]
         if len(tail) == 0 or len(head) == 0:
             #             print(f"No pairs in lag {n}!")
             continue
-        expvario[n] = 1 / (2 * len(tail)) * np.sum((tail - head) ** 2)
+        expvario[ilag] = 1 / (2 * len(tail)) * np.sum((tail - head) ** 2)
     # set missing values to sill
-    expvario[np.isnan(expvario)] = np.var(values)
+    # expvario[np.isnan(expvario)] = np.var(values)
     return expvario
 
 
@@ -57,7 +58,7 @@ def expvario_loss(exp_pts, model_pts, lags, lag_wts, sill):
         return 0.0
     exp_pts /= sill
     model_at_lags = get_vario_model_points(model_pts, lags)
-    return np.sum(((exp_pts - model_at_lags) ** 2) * lag_wts)  # / len(exp_pts)
+    return np.sum(((exp_pts - model_at_lags) ** 2) * lag_wts) / len(exp_pts)
 
 
 @njit
@@ -219,9 +220,17 @@ def variogram_pairs(
 
     lag_dict = {}
     bins = []
+
     for n in range(nlags):
+
         lag_pairs = pairs[pairs[:, 2] == n]
-        bins.append(np.mean(lag_pairs[:, -1]))
         lag_dict[n] = (lag_pairs[:, :-1]).astype(int)
+
+        # need to sort out how to handle lags with 0 pairs
+        if len(lag_pairs) == 0:
+            lag_dict.pop(n)
+            continue
+
+        bins.append(np.mean(lag_pairs[:, -1]))
 
     return lag_dict, bins
